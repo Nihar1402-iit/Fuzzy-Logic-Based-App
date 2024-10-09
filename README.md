@@ -1,3 +1,9 @@
+# Fuuzy Logic Based App
+
+*CLICK ON THE IMAGE FOR THE DEMONSTRATION VIDEO*
+[![Project Video Link](https://github.com/user-attachments/assets/0ab5b467-f51a-4428-a877-0e230dc8d12f)](https://youtu.be/EAAbPpsqwIQ?si=i6emgPG5x-_svvky)
+
+
 This folder contains the Control Systems app created using MATLAB App Designer. MATLAB App Designer is an interactive development environment for designing an app layout using custom UI components. 
 
 plots_final.exe is the app created to view various Control Systems plots (Bode plot, pole-zero plot and step response of a second-order transfer function) by changing the various parameters of a second order transfer function (gain K, damping ratio delta and natural frequency omega_n). 
