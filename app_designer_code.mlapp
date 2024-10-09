@@ -1,0 +1,185 @@
+classdef app1 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure             matlab.ui.Figure
+        EvaluatePlotsButton  matlab.ui.control.Button
+        deltaSlider          matlab.ui.control.Slider
+        DampingRatioLabel    matlab.ui.control.Label
+        omega_nSlider        matlab.ui.control.Slider
+        w_nLabel             matlab.ui.control.Label
+        KSlider              matlab.ui.control.Slider
+        KSliderLabel         matlab.ui.control.Label
+        SecondOrderTFLabel   matlab.ui.control.Label
+        UIAxes3              matlab.ui.control.UIAxes
+        UIAxes2              matlab.ui.control.UIAxes
+        UIAxes               matlab.ui.control.UIAxes
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Code that executes after component creation
+        function startupFcn(app)
+            % THIS FUNCTION IS EDITABLE
+            app.UIFigure.Color = '#E6E6FA';
+            app.SecondOrderTFLabel.Interpreter = 'latex';
+            app.SecondOrderTFLabel.Text = 'Second Order Tranfer Function: \frac{$K\omega_{n}^{2}$}{$s^{2} + 2\delta\omega_{n}s + \omega_{n}^{2}$}';
+            
+            K = app.KSlider.Value;
+            w_n = app.omega_nSlider.Value;
+            delta = app.deltaSlider.Value;
+            
+            [num, den] = ord2(w_n, delta);
+            sys = tf(num*K*w_n*w_n, den);
+            
+            bode(app.UIAxes, sys);
+            pzplot(app.UIAxes2, sys);
+            step(app.UIAxes3, sys);
+        end
+
+        % Button pushed function: EvaluatePlotsButton
+        function EvaluatePlotsButtonPushed(app, event)
+            % THIS FUNCTION IS EDITABLE
+            K = app.KSlider.Value;
+            w_n = app.omega_nSlider.Value;
+            delta = app.deltaSlider.Value;
+            [num, den] = ord2(w_n, delta);
+            sys = tf(num*K*w_n*w_n, den);
+            bode(app.UIAxes, sys);
+            pzplot(app.UIAxes2, sys);
+            step(app.UIAxes3, sys);
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 640 480];
+            app.UIFigure.Name = 'MATLAB App';
+            app.UIFigure.Pointer = 'hand';
+
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.UIFigure);
+            title(app.UIAxes, 'Bode')
+            xlabel(app.UIAxes, 'X')
+            ylabel(app.UIAxes, 'Y')
+            zlabel(app.UIAxes, 'Z')
+            app.UIAxes.FontName = 'Times New Roman';
+            app.UIAxes.FontSize = 9;
+            app.UIAxes.Position = [287 268 326 196];
+
+            % Create UIAxes2
+            app.UIAxes2 = uiaxes(app.UIFigure);
+            title(app.UIAxes2, 'PZ Diagram')
+            xlabel(app.UIAxes2, 'X')
+            ylabel(app.UIAxes2, 'Y')
+            zlabel(app.UIAxes2, 'Z')
+            app.UIAxes2.FontName = 'Times New Roman';
+            app.UIAxes2.FontSize = 9;
+            app.UIAxes2.Position = [36 50 282 171];
+
+            % Create UIAxes3
+            app.UIAxes3 = uiaxes(app.UIFigure);
+            title(app.UIAxes3, 'Step Response')
+            xlabel(app.UIAxes3, 'X')
+            ylabel(app.UIAxes3, 'Y')
+            zlabel(app.UIAxes3, 'Z')
+            app.UIAxes3.FontName = 'Times New Roman';
+            app.UIAxes3.FontSize = 9;
+            app.UIAxes3.Position = [348 50 282 171];
+
+            % Create SecondOrderTFLabel
+            app.SecondOrderTFLabel = uilabel(app.UIFigure);
+            app.SecondOrderTFLabel.HorizontalAlignment = 'center';
+            app.SecondOrderTFLabel.Position = [12 404 282 60];
+            app.SecondOrderTFLabel.Text = 'SecondOrderTF';
+
+            % Create KSliderLabel
+            app.KSliderLabel = uilabel(app.UIFigure);
+            app.KSliderLabel.HorizontalAlignment = 'right';
+            app.KSliderLabel.FontName = 'Times New Roman';
+            app.KSliderLabel.Interpreter = 'latex';
+            app.KSliderLabel.Position = [84 245 25 22];
+            app.KSliderLabel.Text = 'K';
+
+            % Create KSlider
+            app.KSlider = uislider(app.UIFigure);
+            app.KSlider.Limits = [0 5];
+            app.KSlider.Orientation = 'vertical';
+            app.KSlider.FontName = 'Times New Roman';
+            app.KSlider.Position = [117 257 3 150];
+
+            % Create w_nLabel
+            app.w_nLabel = uilabel(app.UIFigure);
+            app.w_nLabel.HorizontalAlignment = 'right';
+            app.w_nLabel.VerticalAlignment = 'top';
+            app.w_nLabel.FontName = 'Times New Roman';
+            app.w_nLabel.Interpreter = 'latex';
+            app.w_nLabel.Position = [12 245 25 22];
+            app.w_nLabel.Text = '$\omega_n$';
+
+            % Create omega_nSlider
+            app.omega_nSlider = uislider(app.UIFigure);
+            app.omega_nSlider.Orientation = 'vertical';
+            app.omega_nSlider.Position = [42 257 3 150];
+
+            % Create DampingRatioLabel
+            app.DampingRatioLabel = uilabel(app.UIFigure);
+            app.DampingRatioLabel.HorizontalAlignment = 'right';
+            app.DampingRatioLabel.FontName = 'Times New Roman';
+            app.DampingRatioLabel.Interpreter = 'latex';
+            app.DampingRatioLabel.Position = [152 244 35 25];
+            app.DampingRatioLabel.Text = '$\delta$';
+
+            % Create deltaSlider
+            app.deltaSlider = uislider(app.UIFigure);
+            app.deltaSlider.Limits = [0 1];
+            app.deltaSlider.Orientation = 'vertical';
+            app.deltaSlider.FontName = 'Times New Roman';
+            app.deltaSlider.Position = [196 257 3 150];
+
+            % Create EvaluatePlotsButton
+            app.EvaluatePlotsButton = uibutton(app.UIFigure, 'push');
+            app.EvaluatePlotsButton.ButtonPushedFcn = createCallbackFcn(app, @EvaluatePlotsButtonPushed, true);
+            app.EvaluatePlotsButton.Position = [69 222 100 23];
+            app.EvaluatePlotsButton.Text = 'Evaluate Plots';
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = app1
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            % Execute the startup function
+            runStartupFcn(app, @startupFcn)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
